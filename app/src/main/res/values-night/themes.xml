@@ -1,0 +1,15 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Base.Theme.GithubUser" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/github_dark_primary</item>
+        <item name="colorPrimaryDark">@color/github_dark_primary_dark</item>
+        <item name="colorAccent">@color/github_dark_accent</item>
+        <item name="android:windowBackground">@color/github_dark_background</item>
+        <item name="android:textColor">@color/github_dark_text</item>
+        <item name="android:searchViewStyle">@style/GitHubDarkSearchView</item>
+    </style>
+
+    <style name="GitHubDarkSearchView" parent="@android:style/Widget.Material.SearchView">
+        <item name="android:background">@color/github_dark_searchbar_bg</item>
+    </style>
+</resources>
