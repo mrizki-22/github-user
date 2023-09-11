@@ -15,7 +15,6 @@ class MainActivity : AppCompatActivity() {
 
     companion object {
         private const val TAG = "MainActivity"
-        private const val TOKEN = "token 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"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -30,7 +29,7 @@ class MainActivity : AppCompatActivity() {
 
         //observe userItems
         mainViewModel.userItems.observe(this) { users ->
-            if (users.size > 0){
+            if (users.isNotEmpty()){
                 setUserData(users)
                 binding.notFound.visibility = View.GONE
             }else{
