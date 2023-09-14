@@ -1,13 +1,16 @@
 package com.example.githubuser.ui.activities.main
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.githubuser.data.response.UserItems
+import com.example.githubuser.R
+import com.example.githubuser.data.remote.response.UserItems
 import com.example.githubuser.databinding.ActivityMainBinding
+import com.example.githubuser.ui.activities.setting.SettingActivity
 
 class MainActivity : AppCompatActivity() {
 
@@ -24,15 +27,17 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
 
-
-        val mainViewModel = ViewModelProvider(this, ViewModelProvider.NewInstanceFactory())[MainViewModel::class.java]
+        val mainViewModel = ViewModelProvider(
+            this,
+            ViewModelProvider.NewInstanceFactory()
+        )[MainViewModel::class.java]
 
         //observe userItems
         mainViewModel.userItems.observe(this) { users ->
-            if (users.isNotEmpty()){
+            if (users.isNotEmpty()) {
                 setUserData(users)
                 binding.notFound.visibility = View.GONE
-            }else{
+            } else {
                 setUserData(emptyList())
                 binding.notFound.visibility = View.VISIBLE
                 Log.e(TAG, "onCreate: users is null")
@@ -45,7 +50,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         //search bar
-        with(binding){
+        with(binding) {
             searchView.setupWithSearchBar(searchBar)
             searchView
                 .editText
@@ -57,14 +62,20 @@ class MainActivity : AppCompatActivity() {
                     searchView.hide()
                     false
                 }
+            searchBar.inflateMenu(R.menu.menu_main)
             searchBar.setOnMenuItemClickListener { menuItem ->
-                // Handle menuItem click.
-                true
+                when (menuItem.itemId) {
+                    R.id.setting -> {
+                        val intent = Intent(this@MainActivity, SettingActivity::class.java)
+                        startActivity(intent)
+                        true
+                    }
+                    else -> false
+                }
             }
         }
 
     }
-
 
 
     private fun setUserData(users: List<UserItems>) {
@@ -73,6 +84,7 @@ class MainActivity : AppCompatActivity() {
         binding.rvUsers.adapter = adapter
 
     }
+
     private fun showLoading(b: Boolean) {
         if (b) {
             binding.progressBar.visibility = View.VISIBLE
@@ -82,9 +94,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onBackPressed() {
-        if(binding.searchView.isShowing){
+        if (binding.searchView.isShowing) {
             binding.searchView.hide()
-        }else{
+        } else {
             super.onBackPressed()
         }
 

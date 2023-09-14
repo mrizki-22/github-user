@@ -1,9 +1,9 @@
-package com.example.githubuser.data.response
+package com.example.githubuser.data.remote.response
 
 import com.google.gson.annotations.SerializedName
 
 data class GithubSearchResponse(
-	@field:SerializedName("items")
+    @field:SerializedName("items")
 	val items: List<UserItems>,
 )
 

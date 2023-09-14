@@ -1,19 +1,22 @@
 package com.example.githubuser.ui.activities.detail
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.View
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
-import com.example.githubuser.data.response.UserDetailResponse
+import com.example.githubuser.R
+import com.example.githubuser.data.remote.response.UserDetailResponse
 import com.example.githubuser.databinding.ActivityDetailBinding
 import com.google.android.material.tabs.TabLayoutMediator
 
 class DetailActivity : AppCompatActivity() {
     private lateinit var binding: ActivityDetailBinding
 
+
     companion object {
-        val EXTRA_USERNAME: String = "extra_username"
+        const val EXTRA_USERNAME: String = "extra_username"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -21,30 +24,46 @@ class DetailActivity : AppCompatActivity() {
         binding = ActivityDetailBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        //get username from intent
-        val username= intent.getStringExtra(EXTRA_USERNAME)
+        val username : String = intent.getStringExtra(EXTRA_USERNAME).toString()
 
-        val detailViewModelFactory = DetailViewModelFactory(username.toString())
-
-        val detailViewModel =
-            ViewModelProvider(this, detailViewModelFactory)[DetailViewModel::class.java]
+        val detailViewModel: DetailViewModel by viewModels {
+            DetailViewModelFactory(username, application)
+        }
 
 
-        //observe userdetail
         detailViewModel.userDetail.observe(this) { userDetail ->
             if (userDetail != null) {
                 setDetailData(userDetail)
             }
         }
 
-        //observe isLoading
         detailViewModel.isLoading.observe(this) {
             showLoading(it)
         }
 
+        detailViewModel.isFavorite(username).observe(this) { isFavorite ->
+            if (isFavorite) {
+                binding.fab.setImageResource(R.drawable.ic_favorite)
+                binding.fab.setOnClickListener {
+                    val user = detailViewModel.userDetail.value
+                    if (user != null) {
+                        detailViewModel.removeFromFavorite(user.login)
+                    }
+                }
+            } else {
+                binding.fab.setImageResource(R.drawable.ic_favorite_border)
+                binding.fab.setOnClickListener {
+                    val user = detailViewModel.userDetail.value
+                    if (user != null) {
+                        detailViewModel.addToFavorite(user.login, user.avatarUrl)
+                    }
+                }
+            }
+        }
+
         //pager adapter
         val sectionsPagerAdapter = SectionsPagerAdapter(this)
-        sectionsPagerAdapter.username = username.toString()
+        sectionsPagerAdapter.username = username
         val viewPager = binding.viewPager
         viewPager.adapter = sectionsPagerAdapter
         val tabs = binding.tabs
@@ -55,7 +74,11 @@ class DetailActivity : AppCompatActivity() {
             }
         }.attach()
 
+
+
     }
+
+
 
     private fun showLoading(it: Boolean?) {
         if (it == true) {
@@ -65,6 +88,7 @@ class DetailActivity : AppCompatActivity() {
         }
     }
 
+    @SuppressLint("SetTextI18n")
     private fun setDetailData(userDetail: UserDetailResponse) {
         binding.tvName.text = userDetail.name
         binding.tvUsername.text = userDetail.login
@@ -75,5 +99,6 @@ class DetailActivity : AppCompatActivity() {
             .load(userDetail.avatarUrl)
             .into(binding.ivAvatar)
     }
+
 
 }

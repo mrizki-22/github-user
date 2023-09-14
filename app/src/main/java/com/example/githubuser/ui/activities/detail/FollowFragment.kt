@@ -8,7 +8,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.githubuser.data.response.UserItems
+import com.example.githubuser.data.remote.response.UserItems
 import com.example.githubuser.databinding.FragmentFollowBinding
 import com.example.githubuser.ui.activities.main.UserAdapter
 
@@ -17,7 +17,8 @@ class FollowFragment : Fragment() {
     private var position: Int? = null
     private var username: String? = null
 
-    private lateinit var binding: FragmentFollowBinding
+    private var _binding: FragmentFollowBinding? = null
+    private val binding get() = _binding!!
 
     companion object {
         const val ARG_POSITION = "position"
@@ -28,7 +29,7 @@ class FollowFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = FragmentFollowBinding.inflate(inflater, container, false)
+        _binding = FragmentFollowBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -93,6 +94,10 @@ class FollowFragment : Fragment() {
         }
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
 
 
 }

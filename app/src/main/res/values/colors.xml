@@ -3,7 +3,7 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 
-    <color name="github_light_primary">#7F09F5</color>
+    <color name="github_light_primary">#C38BFB</color>
     <color name="github_light_primary_dark">#e1e4e8</color>
     <color name="github_light_accent">#0366d6</color>
     <color name="github_light_background">#ffffff</color>
