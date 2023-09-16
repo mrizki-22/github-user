@@ -10,7 +10,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.githubuser.data.remote.response.UserItems
 import com.example.githubuser.databinding.FragmentFollowBinding
-import com.example.githubuser.ui.activities.main.UserAdapter
+import com.example.githubuser.ui.adapter.UserAdapter
 
 
 class FollowFragment : Fragment() {
