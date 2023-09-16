@@ -1,6 +1,6 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="Base.Theme.GithubUser" parent="Theme.Material3.DayNight.NoActionBar">
+    <style name="Base.Theme.GithubUser" parent="Theme.Material3.DayNight">
         <item name="colorPrimary">@color/github_light_primary</item>
         <item name="colorPrimaryDark">@color/github_light_primary_dark</item>
         <item name="colorAccent">@color/github_light_accent</item>
