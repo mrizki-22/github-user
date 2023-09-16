@@ -23,13 +23,13 @@ class DetailActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityDetailBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        supportActionBar?.hide()
 
         val username : String = intent.getStringExtra(EXTRA_USERNAME).toString()
 
         val detailViewModel: DetailViewModel by viewModels {
             DetailViewModelFactory(username, application)
         }
-
 
         detailViewModel.userDetail.observe(this) { userDetail ->
             if (userDetail != null) {
