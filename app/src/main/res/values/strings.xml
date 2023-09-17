@@ -11,4 +11,5 @@
     <string name="favorite">Favorite User</string>
     <string name="dark_mode">Dark Mode</string>
     <string name="setting">Setting</string>
+    <string name="menu_share">Share</string>
 </resources>
