@@ -1,6 +1,7 @@
 package com.example.githubuser.ui.activities.detail
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.activity.viewModels
@@ -13,6 +14,7 @@ import com.google.android.material.tabs.TabLayoutMediator
 
 class DetailActivity : AppCompatActivity() {
     private lateinit var binding: ActivityDetailBinding
+    private lateinit var username: String
 
 
     companion object {
@@ -24,8 +26,11 @@ class DetailActivity : AppCompatActivity() {
         binding = ActivityDetailBinding.inflate(layoutInflater)
         setContentView(binding.root)
         supportActionBar?.hide()
+        val menuInflater = menuInflater
+        menuInflater.inflate(R.menu.menu_detail, binding.toolbar.menu)
 
-        val username : String = intent.getStringExtra(EXTRA_USERNAME).toString()
+
+        username =  intent.getStringExtra(EXTRA_USERNAME).toString()
 
         val detailViewModel: DetailViewModel by viewModels {
             DetailViewModelFactory(username, application)
@@ -74,11 +79,20 @@ class DetailActivity : AppCompatActivity() {
             }
         }.attach()
 
-
+        binding.toolbar.setOnMenuItemClickListener {
+            when (it.itemId) {
+                R.id.share -> {
+                    val intent = Intent(Intent.ACTION_SEND)
+                    intent.type = "text/plain"
+                    intent.putExtra(Intent.EXTRA_TEXT, "github.com/$username")
+                    startActivity(Intent.createChooser(intent, "Bagikan"))
+                    true
+                }
+                else -> super.onOptionsItemSelected(it)
+            }
+        }
 
     }
-
-
 
     private fun showLoading(it: Boolean?) {
         if (it == true) {
