@@ -6,7 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.githubuser.data.remote.response.UserItems
 import com.example.githubuser.databinding.FragmentFollowBinding
@@ -28,7 +28,7 @@ class FollowFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         _binding = FragmentFollowBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -40,12 +40,10 @@ class FollowFragment : Fragment() {
             username = it.getString(ARG_USERNAME)
         }
 
-        val followViewModelFactory = FollowViewModelFactory(username.toString())
 
-        val followViewModel = ViewModelProvider(
-            requireActivity(),
-            followViewModelFactory
-        )[FollowViewModel::class.java]
+        val followViewModel : FollowViewModel by viewModels {
+            FollowViewModelFactory(username.toString(), requireActivity().application)
+        }
 
         if (position == 1) {
             if (followViewModel.followers.value == null) {
@@ -87,10 +85,11 @@ class FollowFragment : Fragment() {
     }
 
     private fun showLoading(it: Boolean?) {
+        val progressBar = binding.progressBarFollow
         if (it == true) {
-            binding.progressBarFollow.visibility = View.VISIBLE
+            progressBar.visibility = View.VISIBLE
         } else {
-            binding.progressBarFollow.visibility = View.GONE
+            progressBar.visibility = View.GONE
         }
     }
 

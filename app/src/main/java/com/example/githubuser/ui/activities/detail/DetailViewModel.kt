@@ -6,18 +6,12 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.example.githubuser.data.FavoriteUserRepository
+import com.example.githubuser.data.UserRepository
 import com.example.githubuser.data.local.entity.FavoriteUser
 import com.example.githubuser.data.remote.response.UserDetailResponse
-import com.example.githubuser.data.remote.retrofit.ApiConfig
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
-
-//@TODO : Migrasi viewmodel ke repository
 
 class DetailViewModel(private val username: String, application: Application) : ViewModel() {
-    private val repository = FavoriteUserRepository(application)
+    private val repository = UserRepository(application)
 
     private val _userDetail = MutableLiveData<UserDetailResponse>()
     val userDetail: LiveData<UserDetailResponse> = _userDetail
@@ -36,27 +30,17 @@ class DetailViewModel(private val username: String, application: Application) : 
 
     private fun getUserDetail(username: String) {
         _isLoading.value = true
-        val client = ApiConfig.getApiService().getUserDetail(username)
-        client.enqueue(object : Callback<UserDetailResponse> {
-            override fun onResponse(
-                call: Call<UserDetailResponse>,
-                response: Response<UserDetailResponse>
-            ) {
-                _isLoading.value = false
-                if (response.isSuccessful) {
-                    val responseBody = response.body()
-                    _userDetail.value = responseBody as UserDetailResponse
-                } else {
-                    Log.e(TAG, "onFailure: ${response.message()}")
-                }
-            }
 
-            override fun onFailure(call: Call<UserDetailResponse>, t: Throwable) {
-                _isLoading.value = false
-                Log.e(TAG, "onFailure: ${t.message}")
-            }
-        })
+        repository.getUserDetail(username) { result ->
+            _isLoading.value = false
 
+            result.onSuccess {
+                _userDetail.value = it
+            }.onFailure {
+
+                Log.e(TAG, "Error: ${it.message}")
+            }
+        }
     }
 
     fun addToFavorite(username: String, avatarUrl: String) {
@@ -64,7 +48,7 @@ class DetailViewModel(private val username: String, application: Application) : 
             username = username,
             avatarUrl = avatarUrl
         )
-        repository.insert(user)
+        repository.insertFavoriteUser(user)
     }
 
     fun isFavorite(username: String): LiveData<Boolean> {
@@ -72,7 +56,7 @@ class DetailViewModel(private val username: String, application: Application) : 
     }
 
     fun removeFromFavorite(username: String) {
-        repository.delete(FavoriteUser(username, ""))
+        repository.deleteFavoriteUser(FavoriteUser(username, ""))
 
     }
 

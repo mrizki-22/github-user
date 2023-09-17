@@ -3,11 +3,9 @@ package com.example.githubuser.ui.adapter
 import android.content.Intent
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.lifecycle.LiveData
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.githubuser.data.local.entity.FavoriteUser
-import com.example.githubuser.data.remote.response.UserItems
 import com.example.githubuser.databinding.ItemUserBinding
 import com.example.githubuser.ui.activities.detail.DetailActivity
 

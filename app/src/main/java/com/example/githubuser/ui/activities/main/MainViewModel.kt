@@ -1,17 +1,17 @@
 package com.example.githubuser.ui.activities.main
 
+import android.app.Application
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.githubuser.data.remote.response.GithubSearchResponse
+import androidx.lifecycle.ViewModelProvider
+import com.example.githubuser.data.UserRepository
 import com.example.githubuser.data.remote.response.UserItems
-import com.example.githubuser.data.remote.retrofit.ApiConfig
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 
-class MainViewModel : ViewModel() {
+class MainViewModel(application: Application) : ViewModel() {
+    private val repository = UserRepository(application)
+
     private val _userItems = MutableLiveData<List<UserItems>>()
     val userItems: LiveData<List<UserItems>> = _userItems
 
@@ -21,35 +21,27 @@ class MainViewModel : ViewModel() {
 
     companion object {
         private const val TAG = "MainViewModel"
-
     }
 
 
     fun getSearchResult(username: String) {
         _isLoading.value = true
+        repository.getSearchResult(username) { result ->
+            _isLoading.value = false
 
-        val client = ApiConfig.getApiService().searchUsers(username)
-        client.enqueue(object : Callback<GithubSearchResponse> {
-            override fun onResponse(
-                call: Call<GithubSearchResponse>,
-                response: Response<GithubSearchResponse>
-            ) {
-                _isLoading.value = false
-                if (response.isSuccessful) {
-                    val responseBody = response.body()
-                    if (responseBody != null) {
-                        val users  = responseBody.items
-                        _userItems.value = users
-                    }
-                } else {
-                    Log.e(TAG, "onFailure: ${response.message()}")
-                }
+            result.onSuccess {
+                _userItems.value = it.items
+            }.onFailure {
+                Log.e(TAG, "Error: ${it.message}")
             }
-
-            override fun onFailure(call: Call<GithubSearchResponse>, t: Throwable) {
-                _isLoading.value = false
-                Log.e(TAG, "onFailure: ${t.message}")
-            }
-        })
+        }
     }
+}
+
+//factory
+class MainViewModelFactory(private val application: Application) : ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        return MainViewModel(application) as T
+    }
+
 }

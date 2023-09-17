@@ -1,10 +1,9 @@
 package com.example.githubuser.ui.activities.favorite
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.MenuItem
 import androidx.activity.viewModels
-import androidx.lifecycle.LiveData
+import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.githubuser.R
 import com.example.githubuser.data.local.entity.FavoriteUser
@@ -27,7 +26,6 @@ class FavoriteActivity : AppCompatActivity() {
             FavoriteViewModelFactory(application)
         }
 
-        //observe favoriteUsers
         favoriteViewModel.favoriteUsers.observe(this) { favoriteUsers ->
             if (favoriteUsers.isNotEmpty()) {
                 setFavoriteUserData(favoriteUsers)

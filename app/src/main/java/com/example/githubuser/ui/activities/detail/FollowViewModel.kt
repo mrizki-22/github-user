@@ -1,17 +1,17 @@
 package com.example.githubuser.ui.activities.detail
 
+import android.app.Application
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.example.githubuser.data.UserRepository
 import com.example.githubuser.data.remote.response.UserItems
-import com.example.githubuser.data.remote.retrofit.ApiConfig
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 
-class FollowViewModel(private val username: String) : ViewModel() {
+class FollowViewModel(private val username: String, application: Application) : ViewModel() {
+    private val repository = UserRepository(application)
+
     private val _followers = MutableLiveData<List<UserItems>?>()
     val followers: LiveData<List<UserItems>?> = _followers
 
@@ -30,61 +30,40 @@ class FollowViewModel(private val username: String) : ViewModel() {
         getFollowing(username)
     }
 
-   fun getFollowers(username: String) {
+    fun getFollowers(username: String) {
         _isLoading.value = true
-        val client = ApiConfig.getApiService().getUserFollowers(username)
-        client.enqueue(object : Callback<List<UserItems>> {
-            override fun onResponse(
-                call: Call<List<UserItems>>,
-                response: Response<List<UserItems>>
-            ) {
-               _isLoading.value = false
-                if (response.isSuccessful) {
-                    val responseBody = response.body()
-                    if (responseBody != null) {
-                        _followers.value = responseBody
-                    }
-                } else {
-                    Log.e(TAG, "onFailure: ${response.message()}")
-                }
-            }
 
-            override fun onFailure(call: Call<List<UserItems>>, t: Throwable) {
-                Log.e(TAG, "onFailure: ${t.message}")
+        repository.getFollowers(username) { result ->
+            _isLoading.value = false
+
+            result.onSuccess {
+                _followers.value = it
+            }.onFailure {
+                Log.e(TAG, "Error: ${it.message}")
             }
-        })
+        }
     }
 
-   fun getFollowing(username: String) {
+    fun getFollowing(username: String) {
         _isLoading.value = true
-        val client = ApiConfig.getApiService().getUserFollowing(username)
-        client.enqueue(object : Callback<List<UserItems>> {
-            override fun onResponse(
-                call: Call<List<UserItems>>,
-                response: Response<List<UserItems>>
-            ) {
-                _isLoading.value = false
-                if (response.isSuccessful) {
-                    val responseBody = response.body()
-                    if (responseBody != null) {
-                        _following.value = responseBody
-                    }
-                } else {
-                    Log.e(TAG, "onFailure: ${response.message()}")
-                }
-            }
 
-            override fun onFailure(call: Call<List<UserItems>>, t: Throwable) {
-                Log.e(TAG, "onFailure: ${t.message}")
+        repository.getFollowing(username) { result ->
+            _isLoading.value = false
+
+            result.onSuccess {
+                _following.value = it
+            }.onFailure {
+                Log.e(TAG, "Error: ${it.message}")
             }
-        })
+        }
     }
 }
 
-class FollowViewModelFactory(private val username: String) : ViewModelProvider.Factory {
+class FollowViewModelFactory(private val username: String, private val application: Application) :
+    ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(FollowViewModel::class.java)) {
-            return FollowViewModel(username) as T
+            return FollowViewModel(username, application) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }
