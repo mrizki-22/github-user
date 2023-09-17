@@ -15,4 +15,12 @@
     <style name="GitHubLightSearchView" parent="@android:style/Widget.Material.SearchView">
         <item name="android:background">@color/github_light_searchbar_bg</item>
     </style>
+
+    <style name="Theme.CustomSplashScreenTheme" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/white</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_logo</item>
+        <item name="windowSplashScreenAnimationDuration">300</item>
+        <item name="postSplashScreenTheme">@style/Theme.GithubUser</item>
+    </style>
+
 </resources>

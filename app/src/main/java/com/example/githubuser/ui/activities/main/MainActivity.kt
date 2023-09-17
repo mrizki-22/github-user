@@ -5,12 +5,20 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import androidx.lifecycle.ViewModelProvider
+import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.githubuser.R
+import com.example.githubuser.data.local.datastore.SettingPreferences
+import com.example.githubuser.data.local.datastore.datastore
 import com.example.githubuser.data.remote.response.UserItems
 import com.example.githubuser.databinding.ActivityMainBinding
+import com.example.githubuser.ui.activities.favorite.FavoriteActivity
 import com.example.githubuser.ui.activities.setting.SettingActivity
+import com.example.githubuser.ui.activities.setting.SettingViewModel
+import com.example.githubuser.ui.activities.setting.SettingViewModelFactory
+import com.example.githubuser.ui.adapter.UserAdapter
 
 class MainActivity : AppCompatActivity() {
 
@@ -22,15 +30,28 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        installSplashScreen()
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        supportActionBar?.hide()
+
+        //theme setting
+        val pref = SettingPreferences.getInstance(application.datastore)
+        val settingViewModel: SettingViewModel by viewModels {
+            SettingViewModelFactory(pref)
+        }
+        settingViewModel.getThemeSettings().observe(this) { isDarkModeActive ->
+            if (isDarkModeActive) {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+            } else {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+            }
+        }
 
 
-        val mainViewModel = ViewModelProvider(
-            this,
-            ViewModelProvider.NewInstanceFactory()
-        )[MainViewModel::class.java]
+        val mainViewModel : MainViewModel by viewModels() {
+            MainViewModelFactory(application)
+        }
 
         //observe userItems
         mainViewModel.userItems.observe(this) { users ->
@@ -55,7 +76,6 @@ class MainActivity : AppCompatActivity() {
             searchView
                 .editText
                 .setOnEditorActionListener { textView, actionId, event ->
-                    // mainviewmodel
                     mainViewModel.getSearchResult(textView.text.toString())
 
                     searchBar.text = searchView.text
@@ -67,6 +87,11 @@ class MainActivity : AppCompatActivity() {
                 when (menuItem.itemId) {
                     R.id.setting -> {
                         val intent = Intent(this@MainActivity, SettingActivity::class.java)
+                        startActivity(intent)
+                        true
+                    }
+                    R.id.favorite -> {
+                        val intent = Intent(this@MainActivity, FavoriteActivity::class.java)
                         startActivity(intent)
                         true
                     }
